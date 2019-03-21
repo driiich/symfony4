@@ -65,12 +65,17 @@ class Property
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $city;
+    private $address;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $address;
+    private $postal_code;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $city;
 
     /**
      * @ORM\Column(type="boolean", options={"default"=false})
@@ -81,11 +86,6 @@ class Property
      * @ORM\Column(type="datetime")
      */
     private $created_at;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $postal_code;
 
     /**
      * Property constructor.
