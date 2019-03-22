@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller\Admin;
 
+use App\Entity\Option;
 use App\Entity\Property;
 use App\Form\PropertyType;
 use App\Repository\PropertyRepository;
@@ -33,7 +34,7 @@ class AdminPropertyController extends AbstractController
     }
 
     /**
-     * @Route("/admin", name="admin.property.index")
+     * @Route("/admin/property", name="admin.property.index")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function index()
@@ -68,7 +69,7 @@ class AdminPropertyController extends AbstractController
     }
 
     /**
-     * @Route("/admin/{id}", name="admin.property.edit", methods="GET|POST")
+     * @Route("/admin/property/edit/{id}", name="admin.property.edit", methods="GET|POST")
      * @param Property $property
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response

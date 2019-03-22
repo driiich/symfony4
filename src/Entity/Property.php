@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Cocur\Slugify\Slugify;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PropertyRepository")
@@ -13,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Property
 {
+
     const HEAT = [
         0 => 'Electrique',
         1 => 'Gaz'
@@ -26,7 +29,7 @@ class Property
     private $id;
 
     /**
-     * @Assert\Length(min="5", max="255")
+     * @Assert\Length(min=5, max=255)
      * @ORM\Column(type="string", length=255)
      */
     private $title;
@@ -37,8 +40,8 @@ class Property
     private $description;
 
     /**
-     * @Assert\Range(min=10, max=400)
      * @ORM\Column(type="integer")
+     * @Assert\Range(min=10, max=400)
      */
     private $surface;
 
@@ -70,6 +73,11 @@ class Property
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $city;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $address;
 
     /**
@@ -79,12 +87,7 @@ class Property
     private $postal_code;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $city;
-
-    /**
-     * @ORM\Column(type="boolean", options={"default"=false})
+     * @ORM\Column(type="boolean", options={"default": false})
      */
     private $sold = false;
 
@@ -94,11 +97,14 @@ class Property
     private $created_at;
 
     /**
-     * Property constructor.
+     * @ORM\ManyToMany(targetEntity="App\Entity\Option", inversedBy="properties")
      */
+    private $options;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
+        $this->options = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -111,17 +117,16 @@ class Property
         return $this->title;
     }
 
-    public function getSlug(): string
-    {
-        return (new Slugify)->slugify($this->title);
-
-    }
-
     public function setTitle(string $title): self
     {
         $this->title = $title;
 
         return $this;
+    }
+
+    public function getSlug(): string
+    {
+        return (new Slugify())->slugify($this->title);
     }
 
     public function getDescription(): ?string
@@ -196,6 +201,11 @@ class Property
         return $this;
     }
 
+    public function getFormattedPrice(): string
+    {
+        return number_format($this->price, 0, '', ' ');
+    }
+
     public function getHeat(): ?int
     {
         return $this->heat;
@@ -237,6 +247,18 @@ class Property
         return $this;
     }
 
+    public function getPostalCode(): ?string
+    {
+        return $this->postal_code;
+    }
+
+    public function setPostalCode(string $postal_code): self
+    {
+        $this->postal_code = $postal_code;
+
+        return $this;
+    }
+
     public function getSold(): ?bool
     {
         return $this->sold;
@@ -261,20 +283,31 @@ class Property
         return $this;
     }
 
-    public function getPostalCode(): ?string
+    /**
+     * @return Collection|Option[]
+     */
+    public function getOptions(): Collection
     {
-        return $this->postal_code;
+        return $this->options;
     }
 
-    public function setPostalCode(string $postal_code): self
+    public function addOption(Option $option): self
     {
-        $this->postal_code = $postal_code;
+        if (!$this->options->contains($option)) {
+            $this->options[] = $option;
+            $option->addProperty($this);
+        }
 
         return $this;
     }
 
-    public function getFormattedPrice(): string
+    public function removeOption(Option $option): self
     {
-        return number_format($this->price, 0, '', ' ');
+        if ($this->options->contains($option)) {
+            $this->options->removeElement($option);
+            $option->removeProperty($this);
+        }
+
+        return $this;
     }
 }
